@@ -3,6 +3,8 @@ package com.epicentrogourmet.hito2.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -46,6 +48,7 @@ public class AdminController {
     }
 
     @PostMapping("/unidades/nuevo")
+    @Transactional // <--- AGREGA ESTO (Maneja la transacción atómica)
     public String guardarUnidadYResponsable(@ModelAttribute("registroForm") RegistroUnidadDTO form, Model model) {
         try {
             if (usuarioRepository.findByUserName(form.getEmailResponsable()).isPresent()) {
@@ -109,6 +112,9 @@ public class AdminController {
             return "redirect:/home?unidadCreada=true";
 
         } catch (Exception e) {
+            // SI HAY CUALQUIER ERROR, SE DESHACE TODO LO GUARDADO EN ESTE MÉTODO
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly(); 
+            
             model.addAttribute("mensajeError", "Error: " + e.getMessage());
             model.addAttribute("festivales", festivalRepository.findAll());
             return "admin/unidades/formulario";

@@ -58,14 +58,6 @@ public class PedidoController {
 	@Autowired
 	private ModelMapper modelMapper;
 
-	// ---------------------------------------------------------------------
-	// Helper: obtiene el Cajero logueado o null si el usuario no lo es.
-	// Devuelve null si:
-	//   - no hay sesión
-	//   - el username no existe
-	//   - el usuario no tiene perfil de empleado
-	//   - el empleado no es del subtipo Cajero
-	// ---------------------------------------------------------------------
 	private Cajero obtenerCajeroAutenticado(UserDetails userDetails) {
 		if (userDetails == null) {
 			return null;
@@ -86,13 +78,8 @@ public class PedidoController {
 		return (Cajero) empleado;
 	}
 
-	// ---------------------------------------------------------------------
-	// GET /pedidos/nuevo
-	// El cajero NO elige la unidad: se fuerza desde su perfil.
-	// Los platos se filtran por los asociados a su unidad (con fallback).
-	// @Transactional(readOnly=true) asegura que la colección LAZY
-	// UnidadDeVenta.platos se pueda leer fuera de la sesión (OSIV).
-	// ---------------------------------------------------------------------
+
+
 	@GetMapping("/nuevo")
 	@Transactional(readOnly = true)
 	public String mostrarFormularioPedido(@AuthenticationPrincipal UserDetails userDetails, Model model) {
